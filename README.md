@@ -1,4 +1,4 @@
-# Max-Profit-Data-Preservation-Simulation
+# Priority-Based-Data-Preservation-Simulation
 
 ---
 A simulation for testing data preservation of base station-less networks (BSNs) while trying to maximize profit.
@@ -15,16 +15,10 @@ A simulation for testing data preservation of base station-less networks (BSNs) 
 ## About
 
 ---
-This data preservation simulation uses the project [grivera64/Sensor-Network-with-Max-Profit](https://github.com/grivera64/Sensor-Generator-with-Max-Profit)
-to generate a suite of base station-less networks (BSNs) and applies several
-multi-agent policies, such as Greedy and Multi-agent Nash Q-Learning, in comparison to the optimal solution
-using Goldberg's CS2 program.
+This data preservation simulation uses the project [grivera64/Max-Profit-Data-Preservation-Simulation](https://github.com/grivera64/Max-Profit-Data-Preservation-Simulation)
+to generate a suite of base station-less networks (BSNs) to apply ILP-based solutions and compare with previous solutions like Goldberg's CS2 program.
 
-This simulation outputs the energy consumption of using the above algorithms, denoted by E_strategy.
-
-This simulation was used jointly in our paper "Nash Equilibria of Data Preservation in Base Station-less Sensor Networks" by Giovanni Rivera,
-Yutian Chen, and Bin Tang, pp. 6-7. for analyzing the Rate of Efficiency Loss (REL) for each of these strategies in compared
-to the optimal energy consumption from the Minimum Cost Flow algorithm (More information can be found in [grivera64/Sensor-Network-with-MCF](https://github.com/grivera64/Sensor-Generator-with-MCF)).
+This simulation outputs the energy consumption of using the above algorithms.
 
 ## Setup
 
@@ -36,6 +30,10 @@ to the optimal energy consumption from the Minimum Cost Flow algorithm (More inf
 - CS2 executable ([Installation and Setup Instructions](./CS2_SETUP.md))
   - Use `make` to build the binaries from the repository above and save the executable somewhere and remeber its path.
   > Note: We will refer to the path to the CS2 executable as `%PATH_TO_CS2%`.
+- Guava ([Latest Guava Instructions](https://developers.google.com/optimization/install/java))
+  - Dependencies:
+    - JNA ([GitHub Link](https://github.com/java-native-access/jna)) 
+    - Google Protocol Buffers ([GitHub Link](https://github.com/protocolbuffers/protobuf))
 
 ### 1. Clone the Repository
 
@@ -50,7 +48,7 @@ from GitHub [here](https://github.com/grivera64/Data-Preservation-Simulation/arc
 ### 2. Change directories into the source folder.
 
 ```sh
-cd Max-Profit-Data-Preservation-Simulation
+cd Priority-Based-Data-Preservation-Simulation
 cd src
 ```
 
@@ -58,12 +56,12 @@ cd src
 
 Windows:
 ```batch
-javac -p . *.java -d ../bin
+javac -p . -cp ".;%PATH_TO_GUAVA%/*;%PATH_TO_JNA%/*;%PATH_TO_PROTOBUF%/*" *.java -d ../bin
 ```
 
 Mac/Linux:
 ```sh
-find . -name "*.java" -type f -exec javac -p . -d ../bin {} \;
+javac -p "." -cp ".:$PATH_TO_GUAVA/*:$PATH_TO_JNA/*:$PATH_TO_PROTOBUF/*" **.java -d ../bin
 ```
 
 ### 4. Change directories into the binaries folder
@@ -74,8 +72,15 @@ cd bin
 ```
 
 ### 5. Run the program
+
+Windows:
+```bat
+java -p . -cp ".;%PATH_TO_GUAVA%/*;%PATH_TO_JNA%/*;%PATH_TO_PROTOBUF%/*" RunModelTests
+```
+
+Mac/Linux:
 ```sh
-java RunModelTests
+java -p "." -cp ".:$PATH_TO_GUAVA/*:$PATH_TO_JNA/*:$PATH_TO_PROTOBUF/*" RunModelTests
 ```
 
 ## Example
