@@ -1,0 +1,7 @@
+out/
+.idea/
+*.txt
+*.exe
+.vscode/
+cs2*
+.DS_STORE
