@@ -85,6 +85,20 @@ public abstract class SensorNode implements Comparable<SensorNode> {
         this.energy = this.batteryCapacity;
     }
 
+    public boolean canTransmitTo(SensorNode receiverNode, int packets) {
+        return this.calculateTransmissionCost(receiverNode) * packets <= this.energy;
+    }
+
+    public void transmitTo(SensorNode receiverNode, int packets) {
+        if (!this.canTransmitTo(receiverNode, packets)) {
+            throw new IllegalArgumentException(String.format("%s cannot transmit %d packets to %s (%d microJ > %d/%d microJ left)", this.getName(), packets, receiverNode.getName(), this.calculateTransmissionCost(receiverNode) * packets, this.energy, this.batteryCapacity));
+        }
+        if (receiverNode.equals(this)) {
+            return;
+        }
+        this.energy -= this.calculateTransmissionCost(receiverNode) * packets;
+    }
+
     /**
      * Calculates the cost to transmit/relay a data packet from this Sensor Node to a specified receiver Sensor Node
      *
@@ -94,6 +108,21 @@ public abstract class SensorNode implements Comparable<SensorNode> {
     public int calculateTransmissionCost(SensorNode receiverNode) {
         double cost = BITS_PER_PACKET * (E_elec + E_amp * Math.pow(this.distanceTo(receiverNode), 2));
         return (int) Math.round(cost * Math.pow(10, 6));
+    }
+
+    public boolean canReceiveFrom(SensorNode senderNode, int packets) {
+        return this.calculateReceivingCost() * packets <= this.energy;
+    }
+
+    public void receiveFrom(SensorNode senderNode, int packets) {
+        if (!this.canReceiveFrom(senderNode, packets)) {
+            throw new IllegalArgumentException(String.format("%s cannot receive %d packets from %s (%d > %d/%d microJ left)", this.getName(), packets, senderNode.getName(), this.calculateReceivingCost() * packets, this.energy, this.batteryCapacity));
+        }
+
+        if (senderNode.equals(this)) {
+            return;
+        }
+        this.energy -= this.calculateReceivingCost() * packets;
     }
 
     /**
@@ -122,6 +151,7 @@ public abstract class SensorNode implements Comparable<SensorNode> {
     @Override
     public int hashCode() {
         return this.getName().hashCode();
+        // return (37 * this.uuid) + this.energy;
     }
 
     public static void resetCounter() {
@@ -138,4 +168,5 @@ public abstract class SensorNode implements Comparable<SensorNode> {
 
     public abstract void resetPackets();
     public abstract int getId();
+    public abstract boolean canStoreFrom(SensorNode senderNode, int packets);
 }

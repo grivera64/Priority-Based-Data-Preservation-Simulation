@@ -33,19 +33,27 @@ public class DataNode extends SensorNode {
         return this.packetsLeft < 1;
     }
 
-    public boolean canRemovePackets(int deltaPackets) {
-        return this.packetsLeft - deltaPackets >= 0;
+    @Override
+    public boolean canTransmitTo(SensorNode receiver, int deltaPackets) {
+        return super.canTransmitTo(receiver, deltaPackets) && this.packetsLeft - deltaPackets >= 0;
     }
 
-    public void removePackets(int packets) {
-        if (!this.canRemovePackets(packets)) {
-            throw new IllegalArgumentException(
-                    String.format("%s cannot remove %d packets (%d/%d left)",
-                            this.getName(), packets, this.packetsLeft, this.overflowPackets
-                    )
-            );
-        }
+    @Override
+    public void transmitTo(SensorNode receiver, int packets) {
+        super.transmitTo(receiver, packets);
         this.packetsLeft -= packets;
+    }
+
+    public void discardPackets(int packets) {
+        if (packets > this.packetsLeft) {
+            throw new IllegalArgumentException(String.format("DN with %d packets cannot discard %d packets", this.packetsLeft, packets));
+        }
+        this.overflowPackets -= packets;
+    }
+
+    @Override
+    public boolean canStoreFrom(SensorNode senderNode, int packets) {
+        return false;
     }
 
     @Override

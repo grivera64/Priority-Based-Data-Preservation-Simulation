@@ -26,7 +26,7 @@ public class SensorNetwork implements Network {
     private List<TransitionNode> tNodes;
     private Map<SensorNode, Set<SensorNode>> graph;
 
-    private final Map<Pair<SensorNode, SensorNode>, Integer> costMap = new HashMap<>();
+    private final Map<Pair<Pair<SensorNode, Integer>, Pair<SensorNode, Integer>>, Integer> costMap = new HashMap<>();
 
     private final double width, length;
     private int dataPacketCount;
@@ -409,13 +409,13 @@ public class SensorNetwork implements Network {
 
     @Override
     public int calculateMinCost(SensorNode from, SensorNode to) {
-        Pair<SensorNode, SensorNode> pair = Pair.of(from, to);
+        Pair<Pair<SensorNode, Integer>, Pair<SensorNode, Integer>> pair = Pair.of(Pair.of(from, from.getEnergy()), Pair.of(to, to.getEnergy()));
         if (costMap.containsKey(pair)) {
             return costMap.get(pair);
         }
 
         int cost = this.calculateCostOfPath(this.getMinCostPath(from, to));
-        costMap.put(pair, cost);
+        this.costMap.put(pair, cost);
         return cost;
     }
 
@@ -564,35 +564,47 @@ public class SensorNetwork implements Network {
     private List<SensorNode> bfs(Map<SensorNode, Set<SensorNode>> graph, SensorNode start, SensorNode end) {
         Queue<Tuple<SensorNode, Integer, SensorNode>> q = new PriorityQueue<>(Comparator.comparing(Tuple::second));
         Map<SensorNode, SensorNode> backPointers = new HashMap<>();
-        q.offer(Tuple.of(start, 0, null));
+        for (SensorNode neighbor : graph.getOrDefault(start, Set.of())) {
+            if (!(start.canTransmitTo(neighbor, 1) && neighbor.canReceiveFrom(start, 1))) {
+                continue;
+            }
+            backPointers.put(start, null);
+            q.offer(Tuple.of(neighbor, this.getCost(start, neighbor), start));
+        }
 
         Tuple<SensorNode, Integer, SensorNode> currPair;
-        SensorNode curr;
-        SensorNode prev;
-        int value;
+        SensorNode currNode;
+        SensorNode prevNode;
+        int currCost;
         while (!q.isEmpty()) {
             currPair = q.poll();
-            curr = currPair.first();
-            value = currPair.second();
-            prev = currPair.third();
+            currNode = currPair.first();
+            currCost = currPair.second();
+            prevNode = currPair.third();
 
-            if (!backPointers.containsKey(curr)) {
-                backPointers.put(curr, prev);
-                for (SensorNode neighbor : graph.getOrDefault(curr, Set.of())) {
-                    q.offer(Tuple.of(neighbor, value + this.getCost(curr, neighbor), curr));
-                }
+            if (backPointers.containsKey(currNode)) {
+                continue;
             }
 
-            if (curr.equals(end)) {
+            if (!(prevNode.canTransmitTo(currNode, 1) && currNode.canReceiveFrom(prevNode, 1))) {
+                continue;
+            }
+
+            backPointers.put(currNode, prevNode);
+            for (SensorNode neighbor : graph.getOrDefault(currNode, Set.of())) {
+                q.offer(Tuple.of(neighbor, currCost + this.getCost(currNode, neighbor), currNode));
+            }
+
+            if (currNode.equals(end)) {
                 break;
             }
         }
 
         LinkedList<SensorNode> deque = new LinkedList<>();
-        curr = end;
-        while (curr != null) {
-            deque.push(curr);
-            curr = backPointers.getOrDefault(curr, null);
+        currNode = end;
+        while (currNode != null) {
+            deque.push(currNode);
+            currNode = backPointers.getOrDefault(currNode, null);
         }
 
         return deque;
@@ -631,7 +643,33 @@ public class SensorNetwork implements Network {
 
     @Override
     public boolean canSendPackets(DataNode dn, StorageNode sn, int packets) {
-        return dn.canRemovePackets(packets) && sn.canStore(packets);
+        List<SensorNode> path = this.getMinCostPath(dn, sn);
+        if (path.size() < 2) {
+            return false;
+        }
+
+        int[] costDp = new int[path.size()];
+
+        for (int index = 0; index < path.size(); index++) {
+            costDp[index] = path.get(index).getEnergy();
+        }
+
+        SensorNode from;
+        SensorNode to;
+        for (int index = 0; index < path.size() - 1; index++) {
+            from = path.get(index);
+            to = path.get(index + 1);
+            costDp[index] -= from.calculateTransmissionCost(to) * packets;
+            costDp[index + 1] -= to.calculateReceivingCost() * packets;
+        }
+
+        for (int index = 0; index < path.size(); index++) {
+            if (costDp[index] < 0) {
+                return false;
+            }
+        }
+
+        return path.getLast().canStoreFrom(path.get(path.size() - 2), packets);
     }
 
     @Override
@@ -643,18 +681,30 @@ public class SensorNetwork implements Network {
                             sn.getName(), sn.getSpaceLeft(), this.storageCapacity));
         }
 
-        dn.removePackets(packets);
-        sn.storePackets(packets);
+        List<SensorNode> path = this.getMinCostPath(dn, sn);
+
+        SensorNode tmpFrom;
+        SensorNode tmpTo;
+        for (int index = 0; index < path.size() - 1; index++) {
+            tmpFrom = path.get(index);
+            tmpTo = path.get(index + 1);
+
+            tmpFrom.transmitTo(tmpTo, packets);
+            tmpTo.receiveFrom(tmpFrom, packets);
+        }
     }
 
     @Override
     public void resetPackets() {
-        for (DataNode dn : this.dNodes) {
-            dn.resetPackets();
+        for (SensorNode node : this.nodes) {
+            node.resetPackets();
         }
+    }
 
-        for (StorageNode sn : this.sNodes) {
-            sn.resetPackets();
+    @Override
+    public void resetEnergy() {
+        for (SensorNode node : this.nodes) {
+            node.resetEnergy();
         }
     }
 

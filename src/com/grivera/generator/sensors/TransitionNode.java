@@ -20,4 +20,9 @@ public class TransitionNode extends SensorNode {
     public static void resetCounter() {
         idCounter = 1;
     }
+
+    @Override
+    public boolean canStoreFrom(SensorNode senderNode, int packets) {
+       return false;
+    }
 }

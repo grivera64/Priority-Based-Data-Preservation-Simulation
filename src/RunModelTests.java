@@ -5,6 +5,7 @@ import com.grivera.generator.Network;
 import com.grivera.generator.SensorNetwork;
 import com.grivera.solver.Model;
 import com.grivera.solver.PMPGreedyModel;
+import com.grivera.solver.PriorityGreedyModel;
 
 import java.util.Scanner;
 
@@ -48,18 +49,37 @@ public class RunModelTests {
         }
         System.out.println();
 
+        System.out.print("Print out route? ([Y]es/[N]o)\n(Yes) > ");
+        String printRoute = keyboard.nextLine();
+        boolean showRoute = true;
+        if (printRoute.contains("no") || printRoute.contains("No") || printRoute.equalsIgnoreCase("n")) {
+            showRoute = false;
+        }
+
+        System.out.printf("Please set the initial battery capacity\n(%d) > ", network.getDataNodeById(1).getEnergy());
+        String setbatteryCapacity = keyboard.nextLine();
+
+        int batteryCapacity = Integer.MAX_VALUE;
+        if (!(setbatteryCapacity.isBlank() || setbatteryCapacity.isEmpty())) {
+            batteryCapacity = Integer.parseInt(setbatteryCapacity);
+        }
+
+        network.setBatteryCapacity(batteryCapacity);
+
         System.out.println("Running models...");
         System.out.println("=================");
 
-        Model model = new PMPGreedyModel(network);
+        Model model = new PriorityGreedyModel(network);
         model.run();
-        System.out.println("Greedy:");
+        System.out.println("Priority Greedy:");
         System.out.printf("Value: %d \u00b5J\n", model.getTotalValue());
         System.out.printf("Cost: %d \u00b5J\n", model.getTotalCost());
         System.out.printf("Profit: %d \u00b5J\n", model.getTotalProfit());
         System.out.printf("Packets preserved: %d\n", model.getTotalPackets());
-        System.out.println("Route:");
-        model.printRoute();
+        if (showRoute) {
+            System.out.println("Route:");
+            model.printRoute();
+        }
         System.out.println();
 
         try {
@@ -70,8 +90,10 @@ public class RunModelTests {
             System.out.printf("Cost: %d \u00b5J\n", model.getTotalCost());
             System.out.printf("Profit: %d \u00b5J\n", model.getTotalProfit());
             System.out.printf("Packets preserved: %d\n", model.getTotalPackets());
-            System.out.println("Route:");
-            model.printRoute();
+            if (showRoute) {
+                System.out.println("Route:");
+                model.printRoute();
+            }
         } catch (IllegalArgumentException e) {
             System.out.printf("WARNING: %s\n", e.getMessage());
             System.out.println("Skipping Cs2Model...");
@@ -86,8 +108,10 @@ public class RunModelTests {
         System.out.printf("Cost: %d \u00b5J\n", model.getTotalCost());
         System.out.printf("Profit: %d \u00b5J\n", model.getTotalProfit());
         System.out.printf("Packets preserved: %d\n", model.getTotalPackets());
-        System.out.println("Route:");
-        model.printRoute();
+        if (showRoute) {
+            System.out.println("Route:");
+            model.printRoute();
+        }
         System.out.println();
 
         model = new ILPWeightedModel(network);
@@ -97,8 +121,10 @@ public class RunModelTests {
         System.out.printf("Cost: %d \u00b5J\n", model.getTotalCost());
         System.out.printf("Profit: %d \u00b5J\n", model.getTotalProfit());
         System.out.printf("Packets preserved: %d\n", model.getTotalPackets());
-        System.out.println("Route:");
-        model.printRoute();
+        if (showRoute) {
+            System.out.println("Route:");
+            model.printRoute();
+        }
         System.out.println();
     }
 

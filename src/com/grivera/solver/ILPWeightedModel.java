@@ -52,6 +52,7 @@ public class ILPWeightedModel extends AbstractModel {
     }
 
     public void run(int episodes) {
+        super.run(episodes);
         System.out.println("Warning: Ignoring episodes count; defaulting to 1...");
         this.run();
     }

@@ -52,6 +52,7 @@ public class ILPModel extends AbstractModel {
     }
 
     public void run(int episodes) {
+        super.run(episodes);
         System.out.println("Warning: Ignoring episodes count; defaulting to 1...");
         this.run();
     }
@@ -201,7 +202,7 @@ public class ILPModel extends AbstractModel {
         case OPTIMAL:
             break;
         default:
-            throw new IllegalStateException("The network is not ILP (Weighted) feasible!");
+            throw new IllegalStateException(String.format("The network is not ILP feasible! (%s)", resultStatus));
         }
 
         // Cache the variables used

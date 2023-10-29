@@ -25,6 +25,7 @@ public abstract class AbstractModel implements Model {
     public void run() {
         this.hasRan = true;
         this.network.resetPackets();
+        this.network.resetEnergy();
     }
 
     public void run(int episodes) {
@@ -33,6 +34,7 @@ public abstract class AbstractModel implements Model {
         }
         this.hasRan = true;
         this.network.resetPackets();
+        this.network.resetEnergy();
     }
 
     @Override

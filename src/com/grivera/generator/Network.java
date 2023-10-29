@@ -88,6 +88,7 @@ public interface Network {
     boolean canSendPackets(DataNode dn, StorageNode sn, int packets);
     void sendPackets(DataNode dn, StorageNode sn, int packets);
     void resetPackets();
+    void resetEnergy();
     int calculateProfitOf(DataNode from, StorageNode to);
     SensorNode getSensorNodeByUuid(int uuid);
     DataNode getDataNodeById(int id);

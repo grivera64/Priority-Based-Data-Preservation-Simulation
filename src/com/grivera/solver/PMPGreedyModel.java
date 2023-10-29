@@ -10,7 +10,7 @@ import java.util.*;
 
 public class PMPGreedyModel extends AbstractModel {
 
-    private final Map<SensorNode, List<Tuple<StorageNode, Integer, List<SensorNode>>>> routes = new HashMap<>();
+    private Map<SensorNode, List<Tuple<StorageNode, Integer, List<SensorNode>>>> routes;
     private int totalValue;
     private int totalCost;
     private int totalProfit;
@@ -38,6 +38,7 @@ public class PMPGreedyModel extends AbstractModel {
         this.totalValue = 0;
         this.totalCost = 0;
         this.totalProfit = 0;
+        this.routes = new HashMap<>();
 
         Network network = this.getNetwork();
         StorageNode chosenSn;
@@ -46,6 +47,7 @@ public class PMPGreedyModel extends AbstractModel {
         int cost;
 
         network.resetPackets();
+        network.setBatteryCapacity(Integer.MAX_VALUE);
         int currProfit;
         int currPacketsToSend;
         boolean foundBetterProfit;
@@ -83,14 +85,14 @@ public class PMPGreedyModel extends AbstractModel {
                     this.totalProfit += chosenProfit * packetsToSend;
                     this.totalValue += dn.getOverflowPacketValue() * packetsToSend;
 
-                    routes.putIfAbsent(dn, new ArrayList<>());
-                    routes.get(dn).add(Tuple.of(chosenSn, packetsToSend, network.getMinCostPath(dn, chosenSn)));
+                    this.routes.putIfAbsent(dn, new ArrayList<>());
+                    this.routes.get(dn).add(Tuple.of(chosenSn, packetsToSend, network.getMinCostPath(dn, chosenSn)));
                 /* Discard all packets */
                 } else {
 //                    System.out.printf("%s [%d] -> Dummy [%d] (%d packets discarded)\n",
 //                            dn.getName(), dn.getUuid(), network.getSensorNodes().size() + 1, dn.getOverflowPackets()
 //                    );
-                    dn.removePackets(dn.getPacketsLeft());
+                    dn.discardPackets(dn.getPacketsLeft());
                 }
             }
         }

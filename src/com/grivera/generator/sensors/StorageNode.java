@@ -33,23 +33,25 @@ public class StorageNode extends SensorNode {
         return this.usedSpace;
     }
 
+    public int getSpaceLeft() {
+        return this.capacity - this.usedSpace;
+    }
+
     public boolean isFull() {
         return this.usedSpace >= this.capacity;
     }
 
-    public boolean canStore(int deltaPackets) {
-        return this.usedSpace + deltaPackets <= this.capacity;
+    @Override
+    public void receiveFrom(SensorNode senderNode, int packets) {
+        super.receiveFrom(senderNode, packets);
+        if (this.canStoreFrom(senderNode, packets)) {
+            this.usedSpace += packets;
+        }
     }
 
-    public void storePackets(int packets) {
-        if (!this.canStore(packets)) {
-            throw new IllegalArgumentException(
-                    String.format("%s cannot store %d packets (%d/%d full)",
-                            this.getName(), packets, this.usedSpace, this.capacity
-                    )
-            );
-        }
-        this.usedSpace += packets;
+    @Override
+    public boolean canStoreFrom(SensorNode senderNode, int packets) {
+        return this.canReceiveFrom(senderNode, packets) && this.usedSpace + packets <= this.capacity;
     }
 
     @Override
@@ -62,14 +64,10 @@ public class StorageNode extends SensorNode {
         return this.id;
     }
 
-    public int getSpaceLeft() {
-        return this.capacity - this.usedSpace;
-    }
-
     public int calculateStorageCost() {
         double cost = this.usedSpace * BITS_PER_PACKET * E_store;
         return (int) Math.round(cost * Math.pow(10, 6));
-    }
+    } 
 
     public static void resetCounter() {
         idCounter = 1;
