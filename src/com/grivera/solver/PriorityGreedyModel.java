@@ -19,6 +19,7 @@ public class PriorityGreedyModel extends AbstractModel {
     private int totalValue;
     private int totalCost;
     private int totalProfit;
+    private int totalPackets;
 
     public PriorityGreedyModel(Network network) {
         super(network);
@@ -43,6 +44,7 @@ public class PriorityGreedyModel extends AbstractModel {
         this.totalValue = 0;
         this.totalCost = 0;
         this.totalProfit = 0;
+        this.totalPackets = 0;
         this.routes = new HashMap<>();
         
         Network network = this.getNetwork();
@@ -82,6 +84,10 @@ public class PriorityGreedyModel extends AbstractModel {
         }
 
         this.totalProfit = this.totalValue - this.totalCost;
+
+        for (StorageNode storageNode : this.getNetwork().getStorageNodes()) {
+            this.totalPackets += storageNode.getUsedSpace();
+        }
     }
     
      @Override
@@ -105,12 +111,7 @@ public class PriorityGreedyModel extends AbstractModel {
     @Override
     public int getTotalPackets() {
         super.getTotalPackets();
-
-        int totalPackets = 0;
-        for (StorageNode sn : this.getNetwork().getStorageNodes()) {
-            totalPackets += sn.getUsedSpace();
-        }
-        return totalPackets;
+        return this.totalPackets;
     }
 
     @Override

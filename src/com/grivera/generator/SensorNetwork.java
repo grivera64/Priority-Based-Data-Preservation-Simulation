@@ -409,14 +409,7 @@ public class SensorNetwork implements Network {
 
     @Override
     public int calculateMinCost(SensorNode from, SensorNode to) {
-        Pair<Pair<SensorNode, Integer>, Pair<SensorNode, Integer>> pair = Pair.of(Pair.of(from, from.getEnergy()), Pair.of(to, to.getEnergy()));
-        if (costMap.containsKey(pair)) {
-            return costMap.get(pair);
-        }
-
-        int cost = this.calculateCostOfPath(this.getMinCostPath(from, to));
-        this.costMap.put(pair, cost);
-        return cost;
+        return this.calculateCostOfPath(this.getMinCostPath(from, to));
     }
 
     /**
