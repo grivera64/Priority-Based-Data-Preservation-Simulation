@@ -168,5 +168,9 @@ public abstract class SensorNode implements Comparable<SensorNode> {
 
     public abstract void resetPackets();
     public abstract int getId();
+
+    public abstract boolean canOffloadTo(SensorNode receiverNode, int packets);
+    public abstract void offloadTo(SensorNode receiverNode, int packets);
     public abstract boolean canStoreFrom(SensorNode senderNode, int packets);
+    public abstract void storeFrom(SensorNode senderNode, int packets);
 }

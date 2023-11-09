@@ -25,4 +25,20 @@ public class TransitionNode extends SensorNode {
     public boolean canStoreFrom(SensorNode senderNode, int packets) {
        return false;
     }
+
+    @Override
+    public void storeFrom(SensorNode senderNode, int packets) {
+        throw new UnsupportedOperationException("Transition Nodes cannot store packets");
+    }
+
+    @Override
+    public boolean canOffloadTo(SensorNode receiverNode, int packets) {
+        return false;
+    }
+
+    @Override
+    public void offloadTo(SensorNode receiverNode, int packets) {
+        throw new UnsupportedOperationException("Transition Nodes cannot offload packets");
+    }
+
 }

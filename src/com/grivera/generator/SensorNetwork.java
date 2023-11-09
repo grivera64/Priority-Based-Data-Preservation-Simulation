@@ -4,6 +4,8 @@ import com.grivera.generator.sensors.DataNode;
 import com.grivera.generator.sensors.SensorNode;
 import com.grivera.generator.sensors.StorageNode;
 import com.grivera.generator.sensors.TransitionNode;
+import com.grivera.solver.ILPModel;
+import com.grivera.solver.Model;
 import com.grivera.util.Pair;
 import com.grivera.util.Tuple;
 
@@ -402,6 +404,14 @@ public class SensorNetwork implements Network {
         return p * this.dataPacketCount <= (this.nodes.size() - p) * this.storageCapacity;
     }
 
+    public boolean isMaxFeasible() {
+        Model model = new ILPModel(this);
+        model.run();
+        this.resetEnergy();
+        this.resetPackets();
+        return model.getTotalPackets() == this.dNodes.stream().mapToInt(DataNode::getOverflowPackets).sum();
+    }
+
     @Override
     public Map<SensorNode, Set<SensorNode>> getAdjacencyList() {
         return Collections.unmodifiableMap(this.graph);
@@ -642,7 +652,6 @@ public class SensorNetwork implements Network {
         }
 
         int[] costDp = new int[path.size()];
-
         for (int index = 0; index < path.size(); index++) {
             costDp[index] = path.get(index).getEnergy();
         }
@@ -682,8 +691,17 @@ public class SensorNetwork implements Network {
             tmpFrom = path.get(index);
             tmpTo = path.get(index + 1);
 
-            tmpFrom.transmitTo(tmpTo, packets);
-            tmpTo.receiveFrom(tmpFrom, packets);
+            if (index == 0) {
+                tmpFrom.offloadTo(tmpTo, packets);
+            } else {
+                tmpFrom.transmitTo(tmpTo, packets);
+            }
+
+            if (index == path.size() - 2) {
+                tmpTo.storeFrom(tmpFrom, packets);
+            } else {
+                tmpTo.receiveFrom(tmpFrom, packets);
+            }
         }
     }
 

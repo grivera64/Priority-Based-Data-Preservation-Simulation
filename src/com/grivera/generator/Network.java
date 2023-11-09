@@ -43,6 +43,7 @@ public interface Network {
      *         otherwise false
      */
     boolean isFeasible();
+    boolean isMaxFeasible();
     Map<SensorNode, Set<SensorNode>> getAdjacencyList();    // Returns the connection of nodes (using ID)
     int calculateMinCost(SensorNode from, SensorNode to);
 

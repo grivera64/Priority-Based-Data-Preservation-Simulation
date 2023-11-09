@@ -42,16 +42,18 @@ public class StorageNode extends SensorNode {
     }
 
     @Override
-    public void receiveFrom(SensorNode senderNode, int packets) {
-        super.receiveFrom(senderNode, packets);
-        if (this.canStoreFrom(senderNode, packets)) {
-            this.usedSpace += packets;
-        }
+    public boolean canStoreFrom(SensorNode senderNode, int packets) {
+        return this.canReceiveFrom(senderNode, packets) && this.usedSpace + packets <= this.capacity;
     }
 
     @Override
-    public boolean canStoreFrom(SensorNode senderNode, int packets) {
-        return this.canReceiveFrom(senderNode, packets) && this.usedSpace + packets <= this.capacity;
+    public void storeFrom(SensorNode senderNode, int packets) {
+        if (!this.canStoreFrom(senderNode, packets)) {
+            throw new IllegalArgumentException(String.format("%s with %d spaces left cannot store %d packets", this.getName(), this.getSpaceLeft(), packets));
+        }
+
+        super.receiveFrom(senderNode, packets);
+        this.usedSpace += packets;
     }
 
     @Override
@@ -71,5 +73,15 @@ public class StorageNode extends SensorNode {
 
     public static void resetCounter() {
         idCounter = 1;
+    }
+
+    @Override
+    public boolean canOffloadTo(SensorNode receiverNode, int packets) {
+       return false;
+    }
+
+    @Override
+    public void offloadTo(SensorNode receiverNode, int packets) {
+        throw new UnsupportedOperationException("Storage Nodes cannot offload packets");
     }
 }

@@ -34,19 +34,22 @@ public class DataNode extends SensorNode {
     }
 
     @Override
-    public boolean canTransmitTo(SensorNode receiver, int deltaPackets) {
+    public boolean canOffloadTo(SensorNode receiver, int deltaPackets) {
         return super.canTransmitTo(receiver, deltaPackets) && this.packetsLeft - deltaPackets >= 0;
     }
 
     @Override
-    public void transmitTo(SensorNode receiver, int packets) {
+    public void offloadTo(SensorNode receiver, int packets) {
+        if (!this.canOffloadTo(receiver, packets)) {
+            throw new IllegalArgumentException(String.format("%s with %d packets cannot offload %d packets", this.getName(), this.packetsLeft, packets));
+        }
         super.transmitTo(receiver, packets);
         this.packetsLeft -= packets;
     }
 
     public void discardPackets(int packets) {
         if (packets > this.packetsLeft) {
-            throw new IllegalArgumentException(String.format("DN with %d packets cannot discard %d packets", this.packetsLeft, packets));
+            throw new IllegalArgumentException(String.format("%s with %d packets cannot discard %d packets", this.getName(), this.packetsLeft, packets));
         }
         this.overflowPackets -= packets;
     }
@@ -54,6 +57,11 @@ public class DataNode extends SensorNode {
     @Override
     public boolean canStoreFrom(SensorNode senderNode, int packets) {
         return false;
+    }
+
+    @Override
+    public void storeFrom(SensorNode senderNode, int packets) {
+        throw new UnsupportedOperationException("Data Nodes cannot store packets");
     }
 
     @Override
