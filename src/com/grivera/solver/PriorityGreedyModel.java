@@ -1,7 +1,7 @@
 package com.grivera.solver;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -45,7 +45,7 @@ public class PriorityGreedyModel extends AbstractModel {
         this.totalCost = 0;
         this.totalProfit = 0;
         this.totalPackets = 0;
-        this.routes = new HashMap<>();
+        this.routes = new LinkedHashMap<>();
         
         Network network = this.getNetwork();
         List<DataNode> sortedDns = new ArrayList<>(network.getDataNodes());
@@ -90,7 +90,7 @@ public class PriorityGreedyModel extends AbstractModel {
         }
     }
     
-     @Override
+    @Override
     public int getTotalValue() {
         super.getTotalValue();
         return this.totalValue;

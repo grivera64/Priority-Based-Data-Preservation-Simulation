@@ -4,7 +4,6 @@ import com.grivera.solver.ILPWeightedModel;
 import com.grivera.generator.Network;
 import com.grivera.generator.SensorNetwork;
 import com.grivera.solver.Model;
-import com.grivera.solver.PMPGreedyModel;
 import com.grivera.solver.PriorityGreedyModel;
 
 import java.util.Scanner;

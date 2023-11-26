@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.TreeMap;
+import java.util.LinkedHashMap;
 
 //imports for google OR-tools
 import com.google.ortools.Loader;
@@ -412,7 +412,7 @@ public class ILPWeightedModel extends AbstractModel {
             }
         }
 
-        this.history = new TreeMap<>();
+        this.history = new LinkedHashMap<>();
         int flowEdge;
         int packetEdge;
         int storeEdge;
