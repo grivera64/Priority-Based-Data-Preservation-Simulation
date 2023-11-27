@@ -150,7 +150,7 @@ public abstract class SensorNode implements Comparable<SensorNode> {
 
     @Override
     public int hashCode() {
-        return (37 * this.uuid) + this.energy;
+        return this.uuid;
     }
 
     public static void resetCounter() {
