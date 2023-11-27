@@ -203,7 +203,6 @@ public class PMPCs2Model extends AbstractModel {
         int minCost;
         for (Tuple<SensorNode, SensorNode, Integer> tuple : this.flows) {
             minCost = network.calculateMinCost(tuple.first(), tuple.second());
-            System.out.printf("CS2: %s -(%d)-> %s == %d cost\n", tuple.first(), tuple.third(), tuple.second(), minCost);
             totalCost += minCost * tuple.third();
         }
         return totalCost;

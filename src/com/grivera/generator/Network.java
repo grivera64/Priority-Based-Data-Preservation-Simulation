@@ -87,7 +87,9 @@ public interface Network {
     void setStorageCapacity(int storageCapacity);
     void setBatteryCapacity(int batteryCapacity);
     boolean canSendPackets(DataNode dn, StorageNode sn, int packets);
+    boolean canSendPacketsAlong(List<SensorNode> path, int packets);
     void sendPackets(DataNode dn, StorageNode sn, int packets);
+    void sendPacketsAlong(List<SensorNode> path, int packets);
     void resetPackets();
     void resetEnergy();
     int calculateProfitOf(DataNode from, StorageNode to);

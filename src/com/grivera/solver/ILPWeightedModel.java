@@ -408,7 +408,7 @@ public class ILPWeightedModel extends AbstractModel {
                 if (node1.equals(node2)) {
                     continue;
                 }
-                totalCost += this.cachedX[node1.getUuid() + n][node2.getUuid()] * network.calculateMinCost(node1, node2);
+                this.totalCost += this.cachedX[node1.getUuid() + n][node2.getUuid()] * network.calculateMinCost(node1, node2);
             }
         }
 
@@ -424,6 +424,9 @@ public class ILPWeightedModel extends AbstractModel {
                 flowEdge = this.cachedX[dn.getUuid() + n][sn.getUuid()];
                 storeEdge = this.cachedX[sn.getUuid() + n][sinkIndex];
                 sentPackets = (int) MathUtil.min(packetEdge, flowEdge, storeEdge);
+                if (sentPackets <= 0) {
+                    continue;
+                }
 
                 this.history.putIfAbsent(dn, new ArrayList<>());
                 this.history.get(dn).add(Pair.of(List.of(dn, sn), sentPackets));

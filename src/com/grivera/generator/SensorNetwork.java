@@ -647,6 +647,11 @@ public class SensorNetwork implements Network {
     @Override
     public boolean canSendPackets(DataNode dn, StorageNode sn, int packets) {
         List<SensorNode> path = this.getMinCostPath(dn, sn);
+        return this.canSendPacketsAlong(path, packets);
+    }
+
+    @Override
+    public boolean canSendPacketsAlong(List<SensorNode> path, int packets) {
         if (path.size() < 2) {
             return false;
         }
@@ -678,12 +683,21 @@ public class SensorNetwork implements Network {
     public void sendPackets(DataNode dn, StorageNode sn, int packets) {
         if (!this.canSendPackets(dn, sn, packets)) {
             throw new IllegalArgumentException(
-                    String.format("Cannot send from %s (%d/%d packets left) -> %s (%d/%d space left)\n",
-                            dn.getName(), dn.getPacketsLeft(), this.dataPacketCount,
+                    String.format("Cannot send %d packets from %s (%d/%d packets left) -> %s (%d/%d space left)\n",
+                            packets, dn.getName(), dn.getPacketsLeft(), this.dataPacketCount,
                             sn.getName(), sn.getSpaceLeft(), this.storageCapacity));
         }
 
         List<SensorNode> path = this.getMinCostPath(dn, sn);
+        this.sendPacketsAlong(path, packets);
+    }
+
+    @Override
+    public void sendPacketsAlong(List<SensorNode> path, int packets) {
+        if (!canSendPacketsAlong(path, packets)) {
+            throw new IllegalArgumentException(
+                    String.format("Cannot send %d packets along path %s\n", packets, path));
+        }
 
         SensorNode tmpFrom;
         SensorNode tmpTo;
