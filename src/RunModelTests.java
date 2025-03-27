@@ -12,7 +12,7 @@ public class RunModelTests {
 
     private static final Scanner keyboard = new Scanner(System.in);
     public static void main(String[] args) {
-        System.out.println("Welcome to the Max Profit Data Preservation Simulator!");
+        System.out.println("Welcome to the Priority Based Data Preservation Simulator!");
         System.out.println("===========================================");
         System.out.println();
 
