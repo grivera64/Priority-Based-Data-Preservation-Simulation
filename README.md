@@ -1,7 +1,7 @@
 # Priority-Based-Data-Preservation-Simulation
 
 ---
-A simulation for testing data preservation of base station-less networks (BSNs) while trying to maximize profit.
+A simulation for testing data preservation of base station-less networks (BSNs) according to packet priority.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ A simulation for testing data preservation of base station-less networks (BSNs) 
 ## About
 
 ---
-This data preservation simulation uses the project [grivera64/Max-Profit-Data-Preservation-Simulation](https://github.com/grivera64/Max-Profit-Data-Preservation-Simulation)
+This data preservation simulation uses a fork of the project [grivera64/Max-Profit-Data-Preservation-Simulation](https://github.com/grivera64/Max-Profit-Data-Preservation-Simulation)
 to generate a suite of base station-less networks (BSNs) to apply ILP-based solutions and compare with previous solutions like Goldberg's CS2 program.
 
 This simulation outputs the energy consumption of using the above algorithms.
@@ -39,11 +39,11 @@ This simulation outputs the energy consumption of using the above algorithms.
 
 Open a command line or terminal instance and enter the following command:
 ```sh
-git clone https://github.com/grivera64/Max-Profit-Data-Preservation-Simulation.git
+git clone https://github.com/grivera64/Priority-Based-Data-Preservation-Simulation.git
 ```
 
 You can also download the repository as a zip file directly
-from GitHub [here](https://github.com/grivera64/Data-Preservation-Simulation/archive/refs/heads/main.zip) and unzip it.
+from GitHub [here](https://github.com/grivera64/Priority-Based-Data-Preservation-Simulation/archive/refs/heads/main.zip) and unzip it.
 
 ### 2. Change directories into the source folder.
 
@@ -89,7 +89,7 @@ java -p "." -cp ".:$PATH_TO_GUAVA/*:$PATH_TO_JNA/*:$PATH_TO_PROTOBUF/*" RunModel
 ### Terminal output
 
 ```txt
-Welcome to the Max Profit Data Preservation Simulator!
+Welcome to the Priority Based Profit Data Preservation Simulator!
 ===========================================
 
 Please enter an option: (G)enerate/(F)ile/(Q)uit:
